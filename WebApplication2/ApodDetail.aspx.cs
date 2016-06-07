@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
+using System.Net.Mail;
 using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using Cereris.Actions;
@@ -17,21 +19,10 @@ namespace Cereris
                                            "<h2><a href = \"#\" class=\"gray-only notextdecoration\">{0}</a></h2>" +
                                            "<span class=\"not-active\">{1}</span><div class=\"clear\"></div>" +
                                            "<p>{2}</p>" +
-                                           "<a runat=\"server\" id=\"answerButton_{4}\" href=\"<%= parentStr %> {4}\" class=\"alignleft_block button\">Ответить</a>" +
                                            "<div class=\"clear10\"></div>" +
-                                           " <div class=\"comment\"><form name=\"comment_form_{4}\" style=\"visibility: hidden\" id=\"comment_form_{4}\" class=\"generic-form alignleft_block\" action=\"blog-post.html\"><p>" +
-                                           "<input type=\"text\" runat=\"server\"  name=\"txt_comment_name_{4}\" style=\"width:40%\" id=\"txt_comment_name_{4}\" class=\"medium user\" required=\"true\"></input>" +
-                                           "<label for=\"txt_comment_name\">Имя *</label></p>" +
-                                           "<p><input type =\"email\" runat=\"server\" name=\"txt_comment_email_{4}\"  style=\"width:40%\" id=\"txt_comment_email_{4}\" class=\"medium email\" required=\"true\"></input>" +
-                                           "<label for=\"txt_comment_email\">E-mail *</label></p>" +
-                                           "<p><textarea class=\"xxlarge\" runat=\"server\" rows=\"6\" style=\"width: 60%\" cols=\"4\" name=\"txt_comment_message_{4}\" id=\"txt_comment_message{4}\" required=\"true\"></textarea></p>" +
-                                           "<div id =\"message_box_place_holder_{4}\"></div><div class=\"clear10\"></div>" +
-                                           "<a onserverclick =\"SendClick\" runat=\"server\" class=\"button alignleft_block bold_only\" id=\"btnSubmit_{4}\">Отправить</a>" +
-                                           "</form></div><div class=\"clear10\"></div>" +
                                            "{3}</div>";
         protected string referece { get; set; }
 
-        protected string parentStr { get; set; }
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -43,8 +34,8 @@ namespace Cereris
                 var date = ApodHelper.TodayDate();
                 if (!string.IsNullOrEmpty(dateStr))
                 {
-                    date = DateTime.ParseExact(dateStr, "yyyy-MM-dd",
-                        CultureInfo.InvariantCulture);
+                    DateTime.TryParse(dateStr, out date);
+                   
                 }
                 //ссылка на оригинал
                 this.referece = string.Format("ApodDetail.aspx?date={0}&original=", date.ToString("yyyy-MM-dd"));
@@ -57,7 +48,6 @@ namespace Cereris
 
                 //Заполняем панель "Случайного" контента
                 RadmomeContent();
-
             }
         }
 
@@ -87,17 +77,24 @@ namespace Cereris
                 apod.ViewsCount ++;
                 MainApodObjectOperations.Update(apod);
 
-                var comments = MainApodObjectOperations.GetListComments(apod);
-                var commentsCount = comments.Count;
-                var HTMLPoststring = string.Format("<span class=\"tags\"> Количество просмотров: {0}</span>" +
-                                                   "<span class=\"comments\">({1}) Комментариев</span>",
-                    apod.ViewsCount,
-                    commentsCount);
-                infobar.Controls.Add(new LiteralControl(HTMLPoststring));
-                if (commentsCount != 0)
-                {
-                    AddCommets(comments);
-                }
+                AddPostComments(apod);
+            }
+        }
+
+        private void AddPostComments(NasaAPOD apod)
+        {
+            var comments = MainApodObjectOperations.GetListComments(apod);
+            infobar.Controls.Clear();
+            var commentsCount = comments.Count;
+            var HTMLPoststring = string.Format("<span class=\"tags\"> Количество просмотров: {0}</span>" +
+                                               "<span class=\"comments\">({1}) Комментариев</span>",
+                apod.ViewsCount,
+                commentsCount);
+            infobar.Controls.Add(new LiteralControl(HTMLPoststring));
+            if (commentsCount != 0)
+            {
+                CommentsPosts.Controls.Clear();
+                AddCommets(comments);
             }
         }
 
@@ -174,19 +171,17 @@ namespace Cereris
 
         protected void SendClick(Object sender, EventArgs e)
         {
-            var name = txt_comment_name.Value;
-            var email = txt_comment_email.Value;
-            var text = txt_comment_message.Value;
-            Guid parentId;
-            Guid? parent = null;
-            if (Guid.TryParse(parentStr, out parentId))
-            {
-                parent = parentId;
-            }
-
+            var name = comment_name.Value;
+            var email = comment_email.Value;
+            var text = comment_message.Value;
 
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(text))
+            {
+                throw new Exception("Обязательные поля должныбыть заполнены");
                 return;
+            }
+
+            SendEmailAthor(email, name);
 
             Comments comments = new Comments
             {
@@ -197,13 +192,51 @@ namespace Cereris
                 Text = text,
                 Rating = 0,
                 CreatedDate = DateTime.Now,
-                PublicateDate = null,
+                PublicateDate = DateTime.Now,
                 IsPublic = true,
-                ParentId = parent
+                ParentId = null
 
             };
+
             MainApodObjectOperations.Save(comments);
-            Page_Load(sender, e);
+
+            var apod = MainApodObjectOperations.Get(comments.Post_Id);
+            Page.Response.Redirect(Page.Request.Url.ToString(), true);
+        }
+
+        private void SendEmailAthor(string to, string name)
+        {
+
+            string from = ConfigurationManager.AppSettings["email"];
+            string password = ConfigurationManager.AppSettings["password"];
+            MailMessage message = new MailMessage(from, to)
+            {
+                Subject = "Ваш комментарий был опубликован",
+                Body =  string.Format("Здравствуйте, {0}. Ваш комментарий был опубликован на сайте Cereris."
+                , name)
+            };
+            SmtpClient client = new SmtpClient("smtp.mail.ru", 25);
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.UseDefaultCredentials = false;
+            client.Credentials = new System.Net.NetworkCredential(from, password);
+            client.EnableSsl = true;
+           
+            try
+            {
+                client.Send(message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught in CreateTestMessage2(): {0}",
+                            ex.ToString());
+            }
+        }
+
+        private void ClearCommentsForm()
+        {
+            comment_name.Value = string.Empty;
+            comment_email.Value = string.Empty; 
+            comment_message.Value = string.Empty; 
         }
     }
 }

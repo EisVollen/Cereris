@@ -121,31 +121,31 @@ namespace Cereris {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl CommentsPosts;
         
         /// <summary>
-        /// txt_comment_name control.
+        /// comment_name control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputText txt_comment_name;
+        protected global::System.Web.UI.HtmlControls.HtmlInputText comment_name;
         
         /// <summary>
-        /// txt_comment_email control.
+        /// comment_email control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlInputGenericControl txt_comment_email;
+        protected global::System.Web.UI.HtmlControls.HtmlInputGenericControl comment_email;
         
         /// <summary>
-        /// txt_comment_message control.
+        /// comment_message control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTextArea txt_comment_message;
+        protected global::System.Web.UI.HtmlControls.HtmlTextArea comment_message;
         
         /// <summary>
         /// btnSubmit control.

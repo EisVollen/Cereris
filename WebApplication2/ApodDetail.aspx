@@ -1,12 +1,6 @@
 ﻿<%@ Page Language="C#" EnableEventValidation="false"  MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ApodDetail.aspx.cs" Inherits="Cereris.ApodDetail" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
-    <script>
-        function setParrent(id) {
-            Parrent_Id.setValue(id);
-            document.getElementById("comment_form" + id).style.visibility = "hidden";
-        }
-
-    </script>
+   
       <!--body wrapper-->
     <div id="body-wrapper">
     
@@ -119,15 +113,15 @@
 						<h1 class="heading h1 margin_bottom10">Оставить комментарий</h1>
                         <form name="comment_form" id="comment_form" class="generic-form alignleft_block" action="blog-post.html">
                             <p>
-                                <input type="text" runat="server"  name="txt_comment_name" style="width:40%" id="txt_comment_name" class="medium user" required />
-                                <label for="txt_comment_name">Имя *</label>
+                                <input type="text" runat="server"  name="comment_name" style="width:40%" id="comment_name" class="medium user" required />
+                                <label for="comment_name">Имя *</label>
                             </p>
                             <p>
-                                <input type="email" runat="server" name="txt_comment_email"  style="width:40%" id="txt_comment_email" class="medium email" required />
-                                <label for="txt_comment_email">E-mail *</label>
+                                <input type="email" runat="server" name="comment_email"  style="width:40%" id="comment_email" class="medium email" required />
+                                <label for="comment_email">E-mail *</label>
                             </p>
                             <p>
-                                <textarea class="xxlarge" runat="server" rows="6" style="width: 60%" cols="4" name="txt_comment_message" id="txt_comment_message" required/> 
+                                <textarea class="xxlarge" runat="server" rows="6" style="width: 60%" cols="4" name="comment_message" id="comment_message" required/> 
                             </p>
     
                             <div id="message_box_place_holder"></div>
@@ -153,41 +147,6 @@
                     
                 	 <div class="splitter-h alignleft_block"></div>                    
 
-                    <!--calendar-->
-					<div id="inlineDatepicker"></div>
-                    <!--/calendar-->
-                                   
-					<div class="clear20"></div>
-                    
-                    <!--title-->
-                  	<h1 class="heading-with-left-margin h1">Архив</h1>
-					<!--/title-->                     
-                    
-                	<!--categories-->
-                    <ul class="double-column-ul page-list-menu">
-                        <li><a href="#">Январь 2015</a></li>
-                        <li><a href="#">Февраль 2015</a></li>
-                        <li><a href="#">Март 2015</a></li>
-                        <li><a href="#">Апрель 2015</a></li>
-                        <li><a href="#">Май 2015</a></li>
-                        <li><a href="#">Июнь 2015</a></li>                        
-                    </ul>
-                    
-                    <ul class="double-column-ul page-list-menu">
-                        <li><a href="#">Июль 2015</a></li>
-                        <li><a href="#">Август 2015</a></li>
-                        <li><a href="#">Сентябрь 2015</a></li>
-                        <li><a href="#">Октябрь 2015</a></li>
-                        <li><a href="#">Ноябрь 2015</a></li>
-                        <li><a href="#">Декабрь 2015</a></li>
-                    </ul>                    
-                    <!--/categories-->
-
-                    <div class="clear20"></div>                    
-                    
-                    <!--simple tabs-->
-
-                    <!--tab navigation-->
 					<!--title-->
                   	<h1 class="heading-with-left-margin h1">Популярные</h1>
 					<!--/title-->                     

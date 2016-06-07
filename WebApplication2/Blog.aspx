@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Incorporate Theme / Blog</title>
+<title>Публикации</title>
 <link href='http://fonts.googleapis.com/css?family=Terminal+Dosis:400,700,800,600,500,300,200' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" type="text/css" href="css/reset.css"/>
 <link rel="stylesheet" type="text/css" href="css/style.css"/>
@@ -59,6 +59,7 @@
 
 <script type="text/javascript">
 <!--
+    var selectedDate;
 $(document).ready(function() {
 	
 	$(".post-box").hover(function(){
@@ -71,15 +72,19 @@ $(document).ready(function() {
 		$(this).stop().animate({ "borderTopColor": "#e1e1e1","borderBottomColor": "#e1e1e1","borderLeftColor": "#e1e1e1","borderRightColor": "#e1e1e1" }, 'slow');
 	});	
 	
-	$('#inlineDatepicker')
-		.datePicker({inline:true})
-		.bind(
+	$('#inlineDatepicker').datePicker({
+	    inline: true,
+	    startDate: '16/06/1995',
+	    endDate: (new Date()).asString()
+        })
+        .bind(
 			'dateSelected',
-			function(e, selectedDate, $td)
-			{
-				console.log('You selected ' + selectedDate);
-			}
-		);	
+			function (e, selectedDate, $td) {
+			    var dateS = selectedDate.asString();
+			    window.open("ApodDetail.aspx?date=" + dateS, '_self');
+			    }
+		);;
+
 });
 //-->
 </script>
@@ -92,6 +97,26 @@ $(document).ready(function() {
 
 <!--body-->
 <body>
+     <div id="header-contanier">    
+        
+            <!--header wrapper-->
+            <div id="header" class="center-clear">   
+           
+                <!--header place holder-->
+                <div class="header-place-holder"></div>
+                
+              
+                <!--menu-->
+                <ul id="top_menu" class="sf-menu">
+                    <li><a href="Juno.aspx">Главная</a></li>
+                    <li><a href="Blog.aspx">Публикации</a></li>                                                                
+                    <li><a href="About.aspx">Контактная информация</a></li>           
+                </ul>
+                <!-- /menu-->
+               
+            </div>
+            
+        </div>
 	<%--<asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">--%>
     <!--body wrapper-->
     <div id="body-wrapper">

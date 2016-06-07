@@ -93,9 +93,14 @@ namespace Cereris
                 }
                 _MaxDate = ApodHelper.TodayDate();
             }
-
-            _MinDate = _MaxDate.AddDays(-_CountBlogPost);
-
+            try
+            {
+                _MinDate = ParseDateTime(minDateStr);
+            }
+            catch (Exception)
+            {
+                _MinDate = _MaxDate.AddDays(-_CountBlogPost);
+            }
         }
 
         private void SetMaxArchiveDate(DateTime archiveDate)
@@ -155,11 +160,12 @@ namespace Cereris
                     commentsCount);
                 postStore.Controls.Add(new LiteralControl(HTMLPoststring));
             }
-            _MinDate = listApods.Last() != null? listApods.Last().Date() : _MinDate;
+            _MinDate = listApods.Count > 0? listApods.Last().Date() : _MinDate;
+            _MaxDate = listApods.Count > 0 ? listApods.First().Date() : _MaxDate;
             //навигация
             var nextMaxDate = _MinDate.Date.AddDays(-1);
             var nextMinDate = nextMaxDate.AddDays(-_CountBlogPost);
-            var prevMaxDate = _MaxDate.Date.AddDays(_CountBlogPost);
+            var prevMaxDate = _MaxDate.Date.AddDays(_CountBlogPost+1);
             var prevMinDate = prevMaxDate.AddDays(-_CountBlogPost);
             var maximumAllowableDate = _ArchiveDate == new DateTime()
                 ? ApodHelper.TodayDate()
@@ -168,17 +174,20 @@ namespace Cereris
 
             var buttonPoststring =
                 string.Format("<div class=\"clear10\"></div><div class=\"paging-wrapper blog gray-frame\">{0}{1}</div>{2}",
-                    prevMinDate < maximumAllowableDate
+                    prevMinDate < maximumAllowableDate || (prevMinDate > maximumAllowableDate && _MaxDate < maximumAllowableDate)
                         ? string.Format(
                             "<a href=\"Blog.aspx?minDate={0}&maxDate={1}{2}\" ><span  class=\"next\">&nbsp;</span></a>",
                             prevMinDate.ToString("yyyyMMdd"),
-                            prevMaxDate.ToString("yyyyMMdd"),
+                           (prevMinDate > maximumAllowableDate && _MaxDate <= maximumAllowableDate)?
+                           maximumAllowableDate.ToString("yyyyMMdd")
+                           : prevMaxDate.ToString("yyyyMMdd"),
                             _ArchiveDate != new DateTime() ? "&archiveDate=" + _ArchiveDate.ToString("yyyyMMdd") : "")
                         : "",
-                    nextMinDate >= _ArchiveDate
+                    nextMinDate >= _ArchiveDate || (nextMinDate < _ArchiveDate && _MinDate > _ArchiveDate)
                         ? string.Format(
                             " <a href=\"Blog.aspx?minDate={0}&maxDate={1}{2}\"><span class=\"prev\">&nbsp;</span></a> ",
-                            nextMinDate.ToString("yyyyMMdd"),
+                            (nextMinDate < _ArchiveDate && _MinDate >= _ArchiveDate)?
+                            _ArchiveDate.ToString("yyyyMMdd"): nextMinDate.ToString("yyyyMMdd"),
                             nextMaxDate.ToString("yyyyMMdd"),
                             _ArchiveDate != new DateTime() ? "&archiveDate=" + _ArchiveDate.ToString("yyyyMMdd") : "")
                         : "",

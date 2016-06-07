@@ -138,10 +138,12 @@ namespace Cereris.Actions
         private static List<NasaAPOD> GetListAPODs(DateTime minDate, int postCount, List<NasaAPOD> apodsList,  DateTime archiveDate)
         {
             var date = new DateTime();
+            var archiveDateMax =  new DateTime(archiveDate.Year, archiveDate.Month,
+                    DateTime.DaysInMonth(archiveDate.Year, archiveDate.Month));
             for (int i = 0; i <= postCount; i++)
             {
                 date = minDate.AddDays(i);
-                if (archiveDate != new DateTime() && minDate < archiveDate)
+                if (archiveDate != new DateTime() && (minDate < archiveDate || date > archiveDateMax))
                 {
                     return apodsList;
                 }

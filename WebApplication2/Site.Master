@@ -73,18 +73,8 @@ $(document).ready(function() {
 		$(this).find(".date-box>div>div").stop(true, true).fadeOut("slow");
 				
 		$(this).stop().animate({ "borderTopColor": "#e1e1e1","borderBottomColor": "#e1e1e1","borderLeftColor": "#e1e1e1","borderRightColor": "#e1e1e1" }, 'slow');
-	});	
+	});
 	
-	
-	$('#inlineDatepicker')
-		.datePicker({inline:true})
-		.bind(
-			'dateSelected',
-			function(e, selectedDate, $td)
-			{
-				console.log('You selected ' + selectedDate);
-			}
-		);	
 });
 //-->
 </script>
